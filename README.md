@@ -1,4 +1,7 @@
-# request-cache-indexeddb
+# ng-request-cache
+
+AngularJS HTTP request cache for IndexeDB and $cacheFactory
+
 angularJS 下的`restFul`数据请求缓存服务及服务器端缓存服务, 实现服务器-客户端的数据请求三级缓存服务架构.
 > * 服务器端采用`Memcache`或`Redis`作为缓存服务器, 缓存数据库中的数据, 提供给客户端只读操作查询;
 > * 客户端第一级本地缓存采用`angularJs`的`$cacheFactory`服务, 数据存放在内存中, 当第一次启动项目或`$cacheFactory`中没有指定数据时查询二级缓存
@@ -51,12 +54,23 @@ angularJS 下的`restFul`数据请求缓存服务及服务器端缓存服务, �
             # CMD 安装
             cordova plugin add https://github.com/EddyVerbruggen/Toast-PhoneGap-Plugin.git
 
-3. 下载js文件，保存在你的项目，并且在你的index.html 加载它.
+3. 安装（使用`GIT`克隆 或者 使用`NPM`安装）
+    * 使用`GIT`克隆
+    ```cmd
+    git clone https://github.com/GadflyBSD/ng-request-cache.git
+    ```
+    
+    * 使用`NPM`安装
+    ```cmd
+    npm install ng-request-cache
+    ```
+
+4. 在你的index.html 加载它.
 
         <script src="path/to/request-cache-indexeddb.js"></script>          // PC WEB 项目引入
         <script src="path/to/request-cache-indexeddb-cordova.js"></script>  // Cordova APP 项目引入
 
-4. 加载到你的模块, 并进行配置.
+5. 加载到你的模块, 并进行配置.
 
         var app = angular.module('myApp', ['xc.indexedDB', 'request-cache-indexeddb']);
         app.constant('configs', {

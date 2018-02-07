@@ -18,6 +18,165 @@ angularJS 下的`restFul`数据请求缓存服务及服务器端缓存服务, �
 1. `AngularJs Router` 中`cache`打开的情况下, 只有第一次访问该路由, 才向服务器发出数据请求, 后续对该路由的访问都是得到客户端已缓存的数据
 2. `AngularJs Router` 中`cache`关闭的情况下, 每次访问该路由都向服务器发出数据请求
 
+# ng-unit unitFactory for web PC 工具类自定义服务
+* 需要在`index.html`入口页面引入的CSS文件
+ ```html
+ <link href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+ <link href="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.css" rel="stylesheet">
+ ```
+* 需要在`index.html`入口页面引入的JS文件
+ ```html
+ <script type="text/javascript" src="https://cdn.bootcss.com/underscore.js/1.8.3/underscore-min.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/spin.js/2.3.2/spin.min.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/angular.js/1.6.9/angular.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/angular-filter/0.5.17/angular-filter.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/oclazyload/1.1.0/ocLazyLoad.min.js"></script>
+ <script type="text/javascript" src="node_modules/angular-indexedDB/angular-indexed-db.min.js"></script>
+ <script type="text/javascript" src="node_modules/ng-request-cache/ng-unit-webpc.js"></script>
+ <script type="text/javascript" src="node_modules/ng-request-cache/ng-request-cache.js"></script>
+ ```
+* 加载到你的模块, 并进行的配置.
+ ```javascript
+ var app = angular.module('myApp', ['oc.lazyLoad', 'angular.filter', 'xc.indexedDB', 'ng-unit', 'ng-request-cache']);
+ app.constant('app_config', {
+    db_name: 'myIndexedDB',
+    swal: {
+        allowOutsideClick: false,		// 如果设置为“true”，用户可以通过点击警告框以外的区域关闭警告框。
+		confirmButtonColor: "#DD6B55",	// 该参数用来改变确认按钮的背景颜色（必须是一个HEX值）。
+		confirmButtonText: "确定",		// 该参数用来改变确认按钮上的文字。如果设置为"true"，那么确认按钮将自动将"Confirm"替换为"OK"。
+		type: 'info',					// 窗口的类型。有4种类型的图标动画："warning", "error", "success" 和 "info".可以将它放在"type"数组或通过第三个参数传递。
+		title: null,					// 窗口的名称。可以通过对象的"title"属性或第一个参数进行传递。
+		text: null,						// 窗口的描述。可以通过对象的"text"属性或第二个参数进行传递。
+		showCancelButton: false,		// 如果设置为“true”，“cancel”按钮将显示，点击可以关闭警告框。
+		showConfirmButton: true,		// 如果设置为“false”，“Confirm”按钮将不显示。
+		cancelButtonText: '取消',		// 该参数用来改变取消按钮的文字。
+		closeOnConfirm: true,			// 如果希望以后点击了确认按钮后模态窗口仍然保留就设置为"false"。该参数在其他SweetAlert触发确认按钮事件时十分有用。
+		timer: null						// 警告框自动关闭的时间。单位是ms。
+    },
+    spin: {
+        type: 'spinner',
+        opts: {
+            lines: 13,                  // The number of lines to draw
+			length: 38,                 // The length of each line
+			width: 22,                  // The line thickness
+			radius: 49,                 // The radius of the inner circle
+			scale: 1,                   // Scales overall size of the spinner
+			corners: 1,                 // Corner roundness (0..1)
+			color: '#333333',           // CSS color or array of colors
+			fadeColor: 'transparent',   // CSS color or array of colors
+			opacity: 0.3,               // Opacity of the lines
+			rotate: 0,                  // The rotation offset
+			direction: 1,               // 1: clockwise, -1: counterclockwise
+			speed: 1,                   // Rounds per second
+			trail: 60,                  // Afterglow percentage
+			fps: 20,                    // Frames per second when using setTimeout() as a fallback in IE 9
+			zIndex: 2e9,                // The z-index (defaults to 2000000000)
+			className: 'spinner',       // The CSS class to assign to the spinner
+			top: '50%',                 // Top position relative to parent
+			left: '50%',                // Left position relative to parent
+			shadow: 'none',             // Box-shadow for the lines
+			position: 'absolute'        // Element positioning
+        }
+    },
+    sendSmsWait: 60,
+    extended_timeout: 2000,
+    duration_timeout: 10000,
+    hint_type: 'toastr',
+    restful: {
+        url: 'http://www.yoursite.com/app.php?s=/Api/angular.html',
+		cache: false,
+		timeout: 1000 * 15,
+    },
+    cache_timeout: 5*60*1000,
+ });
+ ```
+
+# ng-unit unitFactory for Ionic & Cordova 工具类自定义服务
+* 需要在`index.html`入口页面引入的CSS文件
+ ```html
+ <link href="https://cdn.bootcss.com/ionic/1.3.2/css/ionic.css" rel="stylesheet">
+ <link href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+ <link href="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.css" rel="stylesheet">
+ ```
+* 需要在`index.html`入口页面引入的JS文件
+ ```html
+ <script type="text/javascript" src="https://cdn.bootcss.com/underscore.js/1.8.3/underscore-min.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/spin.js/2.3.2/spin.min.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/angular.js/1.6.9/angular.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/ionic/1.3.2/js/ionic.bundle.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/ng-cordova/0.1.27-alpha/ng-cordova.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/angular-filter/0.5.17/angular-filter.js"></script>
+ <script type="text/javascript" src="https://cdn.bootcss.com/oclazyload/1.1.0/ocLazyLoad.min.js"></script>
+ <script type="text/javascript" src="node_modules/angular-indexedDB/angular-indexed-db.min.js"></script>
+ <script type="text/javascript" src="node_modules/ng-request-cache/ng-unit-cordova.js"></script>
+ <script type="text/javascript" src="node_modules/ng-request-cache/ng-request-cache.js"></script>
+ <script type="text/javascript" src="cordova.js"></script>
+ ```
+* 需要安装的 `cordova` 插件
+ ```cmd
+ cordova plugin add cordova-plugin-x-toast
+ cordova plugin add cordova-plugin-http
+ ```
+* 加载到你的模块, 并进行的配置.
+ ```javascript
+ var app = angular.module('myApp', ['ionic', 'ngCordova', 'oc.lazyLoad', 'angular.filter', 'xc.indexedDB', 'ng-unit', 'ng-request-cache']);
+ app.constant('app_config', {
+    db_name: 'myIndexedDB',
+    swal: {
+        allowOutsideClick: false,		// 如果设置为“true”，用户可以通过点击警告框以外的区域关闭警告框。
+		confirmButtonColor: "#DD6B55",	// 该参数用来改变确认按钮的背景颜色（必须是一个HEX值）。
+		confirmButtonText: "确定",		// 该参数用来改变确认按钮上的文字。如果设置为"true"，那么确认按钮将自动将"Confirm"替换为"OK"。
+		type: 'info',					// 窗口的类型。有4种类型的图标动画："warning", "error", "success" 和 "info".可以将它放在"type"数组或通过第三个参数传递。
+		title: null,					// 窗口的名称。可以通过对象的"title"属性或第一个参数进行传递。
+		text: null,						// 窗口的描述。可以通过对象的"text"属性或第二个参数进行传递。
+		showCancelButton: false,		// 如果设置为“true”，“cancel”按钮将显示，点击可以关闭警告框。
+		showConfirmButton: true,		// 如果设置为“false”，“Confirm”按钮将不显示。
+		cancelButtonText: '取消',		// 该参数用来改变取消按钮的文字。
+		closeOnConfirm: true,			// 如果希望以后点击了确认按钮后模态窗口仍然保留就设置为"false"。该参数在其他SweetAlert触发确认按钮事件时十分有用。
+		timer: null						// 警告框自动关闭的时间。单位是ms。
+    },
+    spin: {
+        type: 'spinner',
+        opts: {
+            lines: 13,                  // The number of lines to draw
+			length: 38,                 // The length of each line
+			width: 22,                  // The line thickness
+			radius: 49,                 // The radius of the inner circle
+			scale: 1,                   // Scales overall size of the spinner
+			corners: 1,                 // Corner roundness (0..1)
+			color: '#333333',           // CSS color or array of colors
+			fadeColor: 'transparent',   // CSS color or array of colors
+			opacity: 0.3,               // Opacity of the lines
+			rotate: 0,                  // The rotation offset
+			direction: 1,               // 1: clockwise, -1: counterclockwise
+			speed: 1,                   // Rounds per second
+			trail: 60,                  // Afterglow percentage
+			fps: 20,                    // Frames per second when using setTimeout() as a fallback in IE 9
+			zIndex: 2e9,                // The z-index (defaults to 2000000000)
+			className: 'spinner',       // The CSS class to assign to the spinner
+			top: '50%',                 // Top position relative to parent
+			left: '50%',                // Left position relative to parent
+			shadow: 'none',             // Box-shadow for the lines
+			position: 'absolute'        // Element positioning
+        }
+    },
+    sendSmsWait: 60,
+    extended_timeout: 2000,
+    duration_timeout: 10000,
+    hint_type: 'toastr',
+    restful: {
+        url: 'http://www.yoursite.com/app.php?s=/Api/angular.html',
+		cache: false,
+		timeout: 1000 * 15,
+    },
+    cache_timeout: 5*60*1000,
+ });
+ ```
+
 #### 依赖/加载与配置
 1. PC WEB 项目和 Cordova APP 项目都必须引入的文件
     * 下载本服务所使用的<a href="https://github.com/bramski/angular-indexedDB">$indexedDB</a>本地数据库服务封装, 并且在你的index.html中加载它.

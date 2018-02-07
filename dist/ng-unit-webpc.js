@@ -1,5 +1,5 @@
 /**
- * # ng-unit unitFactory for Ionic & Cordova 工具类自定义服务
+ * # ng-unit unitFactory for web PC 工具类自定义服务
  * * 需要在`index.html`入口页面引入的CSS文件
  ```html
  <link href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css" rel="stylesheet">

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="myapp">
+<head>
+	<meta charset="UTF-8">
+	<title>ng request cache examples</title>
+	<link href="https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+</head>
+<body ng-controller="mainCtrl">
+<span id="spinner"></span>
+<toasty></toasty>
+<script src="https://cdn.bootcss.com/angular.js/1.6.9/angular.js"></script>
+<script src="https://cdn.bootcss.com/oclazyload/1.1.0/ocLazyLoad.min.js"></script>
+<script src="https://cdn.bootcss.com/spin.js/2.3.2/spin.min.js"></script>
+<script src="https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js"></script>
+<script src="../dist/ng-request-cache.js"></script>
+<script type="text/javascript">
+	var app = angular.module('myapp', ['oc.lazyLoad', 'ng-request-cache']);
+	app.config(['$ocLazyLoadProvider', function($ocLazyLoadProvider) {
+		$ocLazyLoadProvider.config({
+			debug: true,
+			modules: [
+				{
+					name: 'sweetalert',
+					files: [
+						'https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.css',
+						'https://cdn.bootcss.com/sweetalert/1.1.3/sweetalert.min.js'
+					]
+				},
+				{
+					name: 'spinner',
+					files: [
+						'https://cdn.bootcss.com/spin.js/2.3.2/spin.min.js',
+					]
+				},
+				{
+					name: 'toastr',
+					files: [
+						'https://cdn.bootcss.com/toastr.js/latest/css/toastr.min.css',
+						'https://cdn.bootcss.com/toastr.js/latest/js/toastr.min.js'
+					]
+				},
+			]
+		});
+	}]);
+	app.run(function(){
+		console.log('run');
+	})
+	app.controller('mainCtrl', function($scope, unitFactory){
+		console.log('controller');
+		var spin = unitFactory.spinner();
+		setTimeout(function () {
+			spin.stop();
+		}, 5000);
+	})
+</script>
+</body>
+</html>

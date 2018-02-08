@@ -210,7 +210,7 @@ angular.module('ng-request-cache', [])
 							param.check[key] = check;
 						});
 						_self.request(param, {}, 'get', rsa, false).then(function (result) {
-							var data = getCacheData(result.data.cache, getItem);
+							var data = getCacheData(result.cache, getItem);
 							if(isSpin){
 								if(app_config.spin.type == 'spinner') spinner.stop();
 								if(app_config.spin.type == 'loading') unitFactory.loading_stop();
@@ -218,7 +218,7 @@ angular.module('ng-request-cache', [])
 							if(unitFactory.isEmptyObject(param.merge)){
 								defer.resolve(angular.extend(data, {request: 'http', type: 'success'}));
 							}else{
-								defer.resolve(angular.extend(data, {request: 'http_merge', type: 'success', merge: result.data.merge.data}));
+								defer.resolve(angular.extend(data, {request: 'http_merge', type: 'success', merge: result.merge.data}));
 							}
 						});
 					}else{
@@ -235,7 +235,7 @@ angular.module('ng-request-cache', [])
 									if(app_config.spin.type == 'spinner') spinner.stop();
 									if(app_config.spin.type == 'loading') unitFactory.loading_stop();
 								}
-								defer.resolve(angular.extend(data, {request: 'http_again', type: 'success', merge: result.data.merge.data}));
+								defer.resolve(angular.extend(data, {request: 'http_again', type: 'success', merge: result.merge.data}));
 							});
 						}
 					}

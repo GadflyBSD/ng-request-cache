@@ -304,7 +304,7 @@ angular.module('ng-unit', [])
 				var defer = $q.defer();
 				var _self = this;
 				var rsa_key = $window.localStorage.getItem('rsa_key');
-				if(!unitFactory.isEmptyObject(rsa_key) && params.rsa){
+				if(!_self.isEmptyObject(rsa_key) && params.rsa){
 					var crypt = new JSEncrypt();
 					console.log(angular.fromJson(rsa_key));
 					crypt.setPublicKey(angular.fromJson(rsa_key).client_public);

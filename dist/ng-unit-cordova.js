@@ -105,11 +105,12 @@ angular.module('ng-unit', [])
 		return {
 			sendSmsTimer: function(ele){
 				var that = this;
+				var dom = angular.element(ele)
 				if (wait == 0) {
-					ele.removeAttr('disabled').text("重新获取验证码");
+					dom.removeAttr('disabled').text("重新获取验证码");
 					wait = 60;
 				} else {
-					ele.attr('disabled', 'disabled').text(wait + "秒后重发验证码");
+					dom.attr('disabled', 'disabled').text(wait + "秒后重发验证码");
 					wait--;
 					setTimeout(function(){
 						that.sendSmsTimer(ele);
@@ -160,7 +161,7 @@ angular.module('ng-unit', [])
 				var second = date.getSeconds();
 				return year+'年'+month+'月'+day+'日 '+hour+':'+minute+':'+second;
 			},
-			convertImgToBase64: function (url, callback, outputFormat){
+			imgToBase64: function (url, callback, outputFormat){
 				var canvas = document.createElement('CANVAS'),
 					ctx = canvas.getContext('2d'),
 					img = new Image;
@@ -328,6 +329,46 @@ angular.module('ng-unit', [])
 			disableButtons: function(){
 				swal.disableButtons();
 			},
+			/**
+			 * # 创建公私密钥
+			 * @param keySize
+			 * @returns {{privkey: *, pubkey: *}}
+			 */
+			generateKey: function(keySize){
+				keySize = keySize || 512;
+				var crypt = new JSEncrypt({default_key_size: keySize});
+				crypt.getKey();
+				return {
+					privkey: crypt.getPrivateKey(),
+					pubkey: crypt.getPublicKey(),
+				}
+			},
+			/**
+			 * # 使用公钥对数据进行加密
+			 * @param string
+			 * @param public_key
+			 */
+			encrypt: function(string, public_key){
+				var crypt = new JSEncrypt();
+				crypt.setPublicKey(public_key);
+				return crypt.encrypt(string);
+			},
+			/**
+			 * # 使用私钥对加密数据进行解密
+			 * @param string
+			 * @param private_key
+			 */
+			decrypt: function(string, private_key){
+				var crypt = new JSEncrypt();
+				crypt.setPrivateKey(private_key);
+				return crypt.decrypt(string);
+			},
+			/**
+			 * # HTTP 网络数据请求
+			 * @param params
+			 * @param method
+			 * @returns {Promise}
+			 */
 			http: function(params, method){
 				app_config.extended_timeout = app_config.extended_timeout || 2000;
 				app_config.hint_type = app_config.hint_type || 'toastr';
@@ -339,14 +380,8 @@ angular.module('ng-unit', [])
 				var defer = $q.defer();
 				var _self = this;
 				var rsa_key = $window.localStorage.getItem('rsa_key');
-				if(!_self.isEmptyObject(rsa_key) && params.rsa){
-					var crypt = new JSEncrypt();
-					console.log(angular.fromJson(rsa_key));
-					crypt.setPublicKey(angular.fromJson(rsa_key).client_public);
-					console.log(params.router);
-					params.router = crypt.encrypt(angular.toJson(params.router));
-					console.log(params.router);
-				}
+				if(!_self.isEmptyObject(rsa_key) && params.rsa)
+					params.router = _self.encrypt(angular.toJson(params.router), angular.fromJson(rsa_key).client_public);
 				switch(method.toLowerCase()){
 					case 'get':
 					case 'delete':
@@ -359,7 +394,7 @@ angular.module('ng-unit', [])
 						config.method = method.toLowerCase();
 						config.data = params;
 				}
-				if ($window.cordova && ionic.Platform.isIOS() && !configs.debug.ios) {
+				if ($window.cordova && ionic.Platform.isIOS() && !app_config.debug.ios) {
 					var header = {
 						'cache-control': 'no-cache',
 						'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8'

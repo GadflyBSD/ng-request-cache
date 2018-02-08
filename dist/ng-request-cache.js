@@ -469,6 +469,190 @@ angular.module('ng-request-cache', [])
 					defer.resolve(result);
 				});
 				return defer.promise;
+			},
+			getUserState: function (param, callback) {
+				param.rule = param.rule || 'list';
+				param.alert = param.alert || true;
+				var config = {jump: false};
+				var storage = $window.localStorage.getItem('user');
+				var user = unitFactory.isEmptyObject(storage)?false:angular.fromJson(storage);
+				var identity = {
+					isLogin: (!user || unitFactory.isEmptyObject(user.mobile))?false:true,
+					isRealname: (!user || unitFactory.isEmptyObject(user.is_realname) || user.is_realname == 0)?false:true,
+					isBindweixin: (!user || unitFactory.isEmptyObject(user.is_bindweixin) || user.is_bindweixin == 0)?false:true,
+					isBindweibo: (!user || unitFactory.isEmptyObject(user.is_bindweibo) || user.is_bindweibo == 0)?false:true,
+					isBindqq: (!user || unitFactory.isEmptyObject(user.is_bindqq) || user.is_bindqq == 0)?false:true,
+					isEngineer: (!user || unitFactory.isEmptyObject(user.is_engineer) || user.is_engineer == 0)?false:true,
+				}
+				if(!identity.isLogin)
+					user = {headimg: 'img/no-avatar.jpg'};
+				switch(param.rule){
+					case 'login':
+						if(!identity.isLogin){
+							config = {
+								jump: true,
+								text: '您尚未注册或登录！',
+								button: '现在登录',
+								to: 'login'
+							}
+						}
+						break;
+					case 'register':
+						if(!identity.isLogin){
+							config = {
+								jump: true,
+								text: '您尚未注册或登录！',
+								button: '现在登录',
+								to: 'login'
+							}
+						}
+						break;
+					case 'realname':
+						if(!identity.isLogin){
+							config = {
+								jump: true,
+								text: '您尚未注册或登录！',
+								button: '现在登录',
+								to: 'login'
+							}
+						}else{
+							if(!identity.isRealname){
+								config = {
+									jump: true,
+									text: '您尚未进行实名认证！',
+									button: '去认证',
+									to: 'apply-realname'
+								}
+							}else{
+								if(user.is_realname == 1){
+									config = {
+										jump: true,
+										text: '您的实名认证正在审核中！',
+										button: '等待审核',
+										to: 'app.my'
+									}
+								}
+							}
+						}
+						break;
+					case 'engineer':
+						if(!identity.isLogin){
+							config = {
+								jump: true,
+								text: '您尚未注册或登录！',
+								button: '现在登录',
+								to: 'login'
+							}
+						}else{
+							if(!identity.isRealname){
+								config = {
+									jump: true,
+									text: '您尚未进行实名认证！',
+									button: '去认证',
+									to: 'apply-realname'
+								}
+							}else{
+								if(!identity.isEngineer){
+									config = {
+										jump: true,
+										text: '您尚未进行工程师认证！',
+										button: '现在申请',
+										to: 'apply-engineer'
+									}
+								}else{
+									if(user.is_engineer == 1){
+										config = {
+											jump: true,
+											text: '您的工程师认证正在审核中！',
+											button: '等待审核',
+											to: 'app.my'
+										}
+									}
+								}
+							}
+						}
+						break;
+					case 'bindweixin':
+						if(!identity.isLogin){
+							config = {
+								jump: true,
+								text: '您尚未注册或登录！',
+								button: '现在登录',
+								to: 'login'
+							}
+						}else{
+							if(!identity.isBindweixin){
+								config = {
+									jump: true,
+									text: '您尚未绑定微信！',
+									button: '现在绑定',
+									to: 'app.bindweixin'
+								}
+							}
+						}
+						break;
+					case 'bindweibo':
+						if(!identity.isLogin){
+							config = {
+								jump: true,
+								text: '您尚未注册或登录！',
+								button: '现在登录',
+								to: 'login'
+							}
+						}else{
+							if(!identity.isBindweibo){
+								config = {
+									jump: true,
+									text: '您尚未绑定微博！',
+									button: '现在绑定',
+									to: 'app.bindweibo'
+								}
+							}
+						}
+						break;
+					case 'bindqq':
+						if(!identity.isLogin){
+							config = {
+								jump: true,
+								text: '您尚未注册或登录！',
+								button: '现在登录',
+								to: 'login'
+							}
+						}else {
+							if (!identity.isBindqq) {
+								config = {
+									jump: true,
+									text: '您尚未绑定QQ！',
+									button: '现在绑定',
+									to: 'app.bindqq'
+								}
+							}
+						}
+						break;
+					case 'list':
+						config = { jump: false};
+				}
+				if(config.jump){
+					if(param.alert){
+						unitFactory.confirm({
+							text: config.text,
+							type: "warning",
+							confirmButtonText: config.button,
+							cancelButtonText: "返回",
+							closeOnConfirm: true
+						}, function(){
+							//ngSwal.close();
+							$state.go(config.to, {}, {reload: true});
+						}, function(){
+							//ngSwal.close();
+							$state.go(configs.router.my, {}, { reload: true });
+						});
+					}else{
+						if(typeof(callback) == 'function') callback(user, identity);
+					}
+				}else{
+					if(typeof(callback) == 'function') callback(user, identity);
+				}
 			}
 		}
 	});

@@ -97,13 +97,13 @@ angular.module('ng-request-cache', [])
 				unitFactory.http(params, method).then(function(result){
 					http_response_cache(result);
 					if(isSpin){
-						if(app_config.spin.type == 'spinner') spinner.stop();
+						if(app_config.spin.type == 'spinner') unitFactory.spinner_stop(spinner);
 						if(app_config.spin.type == 'loading') unitFactory.loading_stop();
 					}
 					defer.resolve(result);
 				}, function(error){
 					if(isSpin){
-						if(app_config.spin.type == 'spinner') spinner.stop();
+						if(app_config.spin.type == 'spinner') unitFactory.spinner_stop(spinner);
 						if(app_config.spin.type == 'loading') unitFactory.loading_stop();
 					}
 					defer.reject(error);
@@ -212,7 +212,7 @@ angular.module('ng-request-cache', [])
 						_self.request(param, {}, 'get', rsa, false).then(function (result) {
 							var data = getCacheData(result.cache, getItem);
 							if(isSpin){
-								if(app_config.spin.type == 'spinner') spinner.stop();
+								if(app_config.spin.type == 'spinner') unitFactory.spinner_stop(spinner);
 								if(app_config.spin.type == 'loading') unitFactory.loading_stop();
 							}
 							if(unitFactory.isEmptyObject(param.merge)){
@@ -225,14 +225,14 @@ angular.module('ng-request-cache', [])
 						var data = getCacheData(cache.check, getItem);
 						if(unitFactory.isEmptyObject(param.merge)){
 							if(isSpin){
-								if(app_config.spin.type == 'spinner') spinner.stop();
+								if(app_config.spin.type == 'spinner') unitFactory.spinner_stop(spinner);
 								if(app_config.spin.type == 'loading') unitFactory.loading_stop();
 							}
 							defer.resolve(angular.extend(data, {request: 'cache', type: 'success'}));
 						}else{
 							_self.request(param, {}, 'get', rsa, false).then(function (result) {
 								if(isSpin){
-									if(app_config.spin.type == 'spinner') spinner.stop();
+									if(app_config.spin.type == 'spinner') unitFactory.spinner_stop(spinner);
 									if(app_config.spin.type == 'loading') unitFactory.loading_stop();
 								}
 								defer.resolve(angular.extend(data, {request: 'http_again', type: 'success', merge: result.merge.data}));

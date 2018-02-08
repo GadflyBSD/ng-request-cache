@@ -232,29 +232,44 @@ angular.module('ng-unit', [])
 			spinner: function(id){
 				id = id || 'spinner';
 				var opts = {
-					lines: app_config.spin.lines || 13,
-					length: app_config.spin.length || 38,
-					width: app_config.spin.width || 22,
-					radius: app_config.spin.radius || 49,
-					scale: app_config.spin.scale || 1,
-					corners: app_config.spin.corners || 1,
-					color: app_config.spin.color || '#333333',
-					fadeColor: app_config.spin.fadeColor || 'transparent',
-					opacity: app_config.spin.opacity || 0.3,
-					rotate: app_config.spin.rotate || 0,
-					direction: app_config.spin.direction || 1,
-					speed: app_config.spin.speed || 1,
-					trail: app_config.spin.trail || 60,
-					fps: app_config.spin.fps || 20,
-					zIndex: app_config.spin.zIndex || 2e9,
-					className: app_config.spin.className || 'spinner',
-					top: app_config.spin.top || '50%',
-					left: app_config.spin.left || '50%',
-					shadow: app_config.spin.shadow || 'none',
-					position: app_config.spin.position || 'absolute'
+					lines: app_config.spin.opts.lines || 13,
+					length: app_config.spin.opts.length || 38,
+					width: app_config.spin.opts.width || 22,
+					radius: app_config.spin.opts.radius || 49,
+					scale: app_config.spin.opts.scale || 1,
+					corners: app_config.spin.opts.corners || 1,
+					color: app_config.spin.opts.color || '#333333',
+					fadeColor: app_config.spin.opts.fadeColor || 'transparent',
+					opacity: app_config.spin.opts.opacity || 0.3,
+					rotate: app_config.spin.opts.rotate || 0,
+					direction: app_config.spin.opts.direction || 1,
+					speed: app_config.spin.opts.speed || 1,
+					trail: app_config.spin.opts.trail || 60,
+					fps: app_config.spin.opts.fps || 20,
+					zIndex: app_config.spin.opts.zIndex || 2e9,
+					className: app_config.spin.opts.className || 'spinner',
+					top: app_config.spin.opts.top || '50%',
+					left: app_config.spin.opts.left || '50%',
+					shadow: app_config.spin.opts.shadow || 'none',
+					position: app_config.spin.opts.position || 'absolute'
 				};
 				var target = document.getElementById(id);
+				target.style.display = 'inline';
+				target.style.position = 'fixed';
+				target.style.width = '100%';
+				target.style.height = '100%';
+				target.style.top = '0';
+				target.style.left = '0';
+				target.style.background = '#333';
+				target.style.zIndex = '999999';
+				target.style.opacity = '0.6';
 				return new Spinner(opts).spin(target);
+			},
+			spinner_stop: function (spinner, id) {
+				id = id || 'spinner';
+				var target = document.getElementById(id);
+				target.style.display = 'none';
+				spinner.stop();
 			},
 			toastr: function(param, text, title) {
 				var defer = $q.defer();

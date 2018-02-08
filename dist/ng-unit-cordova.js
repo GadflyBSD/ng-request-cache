@@ -84,7 +84,7 @@
  ```
  */
 angular.module('ng-unit', [])
-	.factory('unitFactory', function($q, $http, $window, $ionicLoading, $cordovaToast, app_config, toastr, requestCacheFactory){
+	.factory('unitFactory', function($q, $http, $window, $ionicLoading, $cordovaToast, app_config, toastr){
 		var wait = app_config.sendSmsWait || 60;
 		function getTitle(type, title){
 			if(angular.isUndefined(title) || title === null){
@@ -344,43 +344,6 @@ angular.module('ng-unit', [])
 						config.method = method.toLowerCase();
 						config.data = params;
 				}
-				var cacheData = function(result){
-					if(!_self.isEmptyObject(result.data.cache)){
-						requestCacheFactory.cacheStorage(null, 'default', result.data.cache);
-					}
-					if(!_self.isEmptyObject(result.data.localStorage)){
-						requestCacheFactory.localStorage(result.data.localStorage);
-					}
-					if(!_self.isEmptyObject(result.data.sessionStorage)){
-						requestCacheFactory.sessionStorage(result.data.sessionStorage);
-					}
-					if(!_self.isEmptyObject(result.data.IndexedDB)){
-						console.log(result.data.IndexedDB);
-						requestCacheFactory.indexeddbStorage(null, 'default', result.data.IndexedDB);
-					}
-					if(!_self.isEmptyObject(result.merge)){
-						var now = _self.timestamp();
-						var result_merge = {};
-						var result_merge_data = {};
-						if(!_self.isEmptyObject(result.merge.data))
-							result_merge = result.merge.data;
-						else if(!_self.isEmptyObject(result.merge.list))
-							result_merge = result.merge.list;
-						else
-							result_merge = result.merge;
-						if(!_self.isEmptyObject(result.merge.key) || !_self.isEmptyObject(params.merge.key)) {
-							var key = 'data-' + now;
-							if (!_self.isEmptyObject(result.merge.key)) key = result.merge.key;
-							if (!_self.isEmptyObject(params.merge.key)) key = params.merge.key;
-							requestCacheFactory.cache.put(key, result_merge);
-							$window.sessionStorage.setItem(key + '_request_dateline', now);
-							result_merge_data[key] = result_merge;
-						}else{
-							result_merge_data = result_merge;
-						}
-						result.merge = result_merge_data;
-					}
-				}
 				if ($window.cordova && ionic.Platform.isIOS() && !configs.debug.ios) {
 					var header = {
 						'cache-control': 'no-cache',
@@ -390,7 +353,6 @@ angular.module('ng-unit', [])
 						window.CordovaHttpPlugin.post(config.url, config.data, header, function (result) {
 							result.data = _self.is_json(result.data)?angular.fromJson(result.data):result.data;
 							if(result.status == 200 && angular.isObject(result.data) && result.data.type.toLowerCase() == 'success'){
-								cacheData(result);
 								if(app_config.hint_type == 'alert'){
 									_self.alert({
 										text: result.data.msg,
@@ -414,12 +376,12 @@ angular.module('ng-unit', [])
 										confirmButtonText: '确定',
 										showCancelButton: false,
 									},function(){
-										defer.resolve(result);
+										defer.reject(result);
 									});
 								}
 								if(app_config.hint_type == 'toastr'){
 									_self.toastr(result.data.type.toLowerCase(), result.data.msg).then(function(){
-										defer.resolve(result);
+										defer.reject(result);
 									});
 								}
 							}
@@ -446,7 +408,6 @@ angular.module('ng-unit', [])
 						window.CordovaHttpPlugin.get(config.url, config.params, header, function(result){
 							result.data = _self.is_json(result.data)?angular.fromJson(result.data):result.data;
 							if(result.status == 200 && angular.isObject(result.data) && result.data.type.toLowerCase() == 'success'){
-								cacheData(result);
 								defer.resolve(result.data);
 							}else{
 								if(app_config.hint_type == 'alert'){
@@ -457,12 +418,12 @@ angular.module('ng-unit', [])
 										confirmButtonText: '确定',
 										showCancelButton: false,
 									},function(){
-										defer.resolve(result);
+										defer.reject(result);
 									});
 								}
 								if(app_config.hint_type == 'toastr'){
 									_self.toastr(result.data.type.toLowerCase(), result.data.msg).then(function(){
-										defer.resolve(result);
+										defer.reject(result);
 									});
 								}
 							}
@@ -489,7 +450,6 @@ angular.module('ng-unit', [])
 				}else{
 					$http(config).then(function(result){
 						if(result.status == 200 && angular.isObject(result.data) && result.data.type.toLowerCase() == 'success'){
-							cacheData(result);
 							if(_.indexOf(['post', 'put'], method.toLowerCase())){
 								if(app_config.hint_type == 'alert'){
 									_self.alert({
@@ -517,12 +477,12 @@ angular.module('ng-unit', [])
 									confirmButtonText: '确定',
 									showCancelButton: false,
 								},function(){
-									defer.resolve(result);
+									defer.reject(result);
 								});
 							}
 							if(app_config.hint_type == 'toastr'){
 								_self.toastr(result.data.type.toLowerCase(), result.data.msg).then(function(){
-									defer.resolve(result);
+									defer.reject(result);
 								});
 							}
 						}

@@ -326,7 +326,7 @@ angular.module('ng-unit', [])
 				}
 				$http(config).then(function(result){
 					if(result.status == 200 && angular.isObject(result.data) && result.data.type.toLowerCase() == 'success'){
-						if(_.indexOf(['post', 'put'], method.toLowerCase())){
+						if(_.indexOf(['post', 'put'], method.toLowerCase()) >= 0){
 							if(app_config.hint_type == 'alert'){
 								_self.alert({
 									text: result.data.msg,
@@ -337,7 +337,7 @@ angular.module('ng-unit', [])
 								});
 							}
 							if(app_config.hint_type == 'toastr'){
-								_self.toastr(result).then(function(){
+								_self.toastr(result.data.type.toLowerCase(), result.data.msg).then(function(){
 									defer.resolve(result.data);
 								});
 							}

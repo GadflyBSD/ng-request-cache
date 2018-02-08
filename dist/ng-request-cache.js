@@ -21,6 +21,43 @@ angular.module('ng-request-cache', [])
 				dateline: unitFactory.isEmptyObject(data.dateline)?dateline:data.dateline
 			};
 		}
+		function http_response_cache(response, params) {
+			if(!unitFactory.isEmptyObject(response.cache)){
+				requestCacheFactory.cacheStorage(null, 'default', response.cache);
+			}
+			if(!unitFactory.isEmptyObject(response.localStorage)){
+				requestCacheFactory.localStorage(response.localStorage);
+			}
+			if(!unitFactory.isEmptyObject(response.sessionStorage)){
+				requestCacheFactory.sessionStorage(response.sessionStorage);
+			}
+			if(!unitFactory.isEmptyObject(response.IndexedDB)){
+				console.log(response.IndexedDB);
+				requestCacheFactory.indexeddbStorage(null, 'default', response.IndexedDB);
+			}
+			if(!unitFactory.isEmptyObject(response.merge)){
+				var now = unitFactory.timestamp();
+				var result_merge = {};
+				var result_merge_data = {};
+				if(!unitFactory.isEmptyObject(response.merge.data))
+					result_merge = response.merge.data;
+				else if(!unitFactory.isEmptyObject(response.merge.list))
+					result_merge = response.merge.list;
+				else
+					result_merge = response.merge;
+				if(!unitFactory.isEmptyObject(response.merge.key) || !unitFactory.isEmptyObject(params.merge.key)) {
+					var key = 'data-' + now;
+					if (!unitFactory.isEmptyObject(response.merge.key)) key = response.merge.key;
+					if (!unitFactory.isEmptyObject(params.merge.key)) key = params.merge.key;
+					requestCacheFactory.cache.put(key, result_merge);
+					$window.sessionStorage.setItem(key + '_request_dateline', now);
+					result_merge_data[key] = result_merge;
+				}else{
+					result_merge_data = result_merge;
+				}
+				response.merge = result_merge_data;
+			}
+		}
 		var angularCache = $cacheFactory.get('angularCache') || $cacheFactory('angularCache');
 		return {
 			request: function(param, router, method, rsa, isSpin) {
@@ -57,6 +94,7 @@ angular.module('ng-request-cache', [])
 				if(!unitFactory.isEmptyObject(param.check)) params.check = angular.toJson(param.check);
 				if(!unitFactory.isEmptyObject(param.merge)) params.merge = angular.toJson(param.merge);
 				unitFactory.http(params, method).then(function(result){
+					http_response_cache(result, params);
 					if(isSpin){
 						if(app_config.spin.type == 'spinner') spinner.stop();
 						if(app_config.spin.type == 'loading') unitFactory.loading_stop();

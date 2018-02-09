@@ -46,7 +46,7 @@ angular.module('ng-request-cache', [])
 				}else{
 					params.router = router;
 				}
-				params.data = (unitFactory.isEmptyObject(param.data))?{}:angular.toJson(param.data);
+				params.data = (unitFactory.isEmptyObject(param.data))?{}:param.data;
 				if($window.localStorage.getItem('user') && angular.isUndefined(param.uid)){
 					var user = angular.fromJson($window.localStorage.getItem('user'));
 					params.data.uid = user.uid;
@@ -55,8 +55,8 @@ angular.module('ng-request-cache', [])
 					var device = angular.fromJson($window.localStorage.getItem('device'));
 					params.data.uuid = device.uuid;
 				}
-				if(!unitFactory.isEmptyObject(param.check)) params.check = angular.toJson(param.check);
-				if(!unitFactory.isEmptyObject(param.merge)) params.merge = angular.toJson(param.merge);
+				if(!unitFactory.isEmptyObject(param.check)) params.check = param.check;
+				if(!unitFactory.isEmptyObject(param.merge)) params.merge = param.merge;
 				function http_response_cache(response) {
 					if(!unitFactory.isEmptyObject(response.cache)){
 						_self.cacheStorage(null, 'default', response.cache);

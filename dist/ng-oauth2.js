@@ -8,10 +8,6 @@ angular.module('ng-oauth2', [])
 			 * @param callback
 			 */
 			sendSms: function(param, $event, callback){
-				var data = angular.toJson({
-					mobile: param.mobile,
-					action: unitFactory.isEmptyObject(param.action)?'register':param.action
-				});
 				var wait = app_config.sendSmsWait || 60;
 				var sendSmsTimer = function(ele){
 					var dom = angular.element(ele)
@@ -26,7 +22,10 @@ angular.module('ng-oauth2', [])
 						}, 1000)
 					}
 				}
-				unitFactory.http({router: angular.toJson(app_config.router.server.sendSmsCode), data: data}, 'post').then(function(resp){
+				unitFactory.http({router: app_config.router.server.sendSmsCode, data: {
+						mobile: param.mobile,
+						action: unitFactory.isEmptyObject(param.action)?'register':param.action
+					}}, 'post').then(function(resp){
 					sendSmsTimer($event.target);
 					if(typeof(callback) == 'function') callback(resp);
 				});

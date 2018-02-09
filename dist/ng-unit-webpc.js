@@ -364,17 +364,21 @@ angular.module('ng-unit', [])
 				var rsa_key = $window.localStorage.getItem('rsa_key');
 				if(!_self.isEmptyObject(rsa_key) && params.rsa)
 					params.router = _self.encrypt(angular.toJson(params.router), angular.fromJson(rsa_key).client_public);
+				var after = {};
+				angular.forEach(params, function(obj, key){
+					if(!_self.isEmptyObject(obj)) this[key] = angular.isObject(obj)?angular.toJson(obj):obj;
+				}, after);
 				switch(method.toLowerCase()){
 					case 'get':
 					case 'delete':
 						config.method = method.toLowerCase();
-						config.params = params;
+						config.params = after;
 						break;
 					case 'post':
 					case 'put':
 					default:
 						config.method = method.toLowerCase();
-						config.data = params;
+						config.data = after;
 				}
 				$http(config).then(function(result){
 					if(result.status == 200 && angular.isObject(result.data) && result.data.type.toLowerCase() == 'success'){

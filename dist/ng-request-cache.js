@@ -501,12 +501,19 @@ angular.module('ng-request-cache', [])
 				}
 				return defer.promise;
 			},
-			initialize: function (memcache) {
+			initialize: function (cache, refresh) {
+				refresh = angular.isUndefined(refresh)?false:refresh;
 				var defer = $q.defer();
-				this.request({check: memcache}).then(function(result){
-					$window.localStorage.setItem("initialize_APP", "true");
-					defer.resolve(result);
-				});
+				var initialize = $window.localStorage.getItem("initialize_APP");
+				if(angular.isUndefined(initialize) || initialize != 'true' || refresh){
+					this.request({check: cache}).then(function(result){
+						$window.localStorage.setItem("initialize_APP", "true");
+						$window.localStorage.setItem("initialize_datetime", unitFactory.datetime());
+						defer.resolve(result);
+					});
+				}else{
+					defer.reject();
+				}
 				return defer.promise;
 			},
 			getUserState: function (param, callback) {

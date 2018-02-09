@@ -75,9 +75,8 @@
  ```
  */
 angular.module('ng-unit', [])
-	.factory('unitFactory', function($q, $http, $window, app_config, toastr){
-		var wait = app_config.sendSmsWait || 60;
-		function getTitle(type, title){
+	.factory('unitFactory', function($q, $http, $window, $injector, $ocLazyLoad, $timeout, app_config, toastr){
+		var getTitle = function(type, title){
 			if(angular.isUndefined(title) || title === null){
 				switch(type.toLowerCase()){
 					case 'success':
@@ -94,20 +93,6 @@ angular.module('ng-unit', [])
 			}
 		}
 		return {
-			sendSmsTimer: function(ele){
-				var that = this;
-				var dom = angular.element(ele)
-				if (wait == 0) {
-					dom.removeAttr('disabled').text("重新获取验证码");
-					wait = 60;
-				} else {
-					dom.attr('disabled', 'disabled').text(wait + "秒后重发验证码");
-					wait--;
-					setTimeout(function(){
-						that.sendSmsTimer(ele);
-					}, 1000)
-				}
-			},
 			isEmptyObject: function(e){
 				if(angular.isUndefined(e) || e === null){
 					return true;
@@ -184,7 +169,7 @@ angular.module('ng-unit', [])
 					type: type,
 					title: getTitle(type, param.title),
 					showConfirmButton: false,
-					timer: 2000,
+					timer: app_config.timeout.extended || 2000,
 				}
 				swal(angular.extend(config, param));
 			},
@@ -234,7 +219,7 @@ angular.module('ng-unit', [])
 					title: getTitle('info'),
 					text: '<h5 style="color: #797979">正在 <span class="progressText">'+text+'</span> 请等待！</h5>',
 					showLoaderOnConfirm: true,
-					timer: app_config.duration_timeout
+					timer: app_config.timeout.duration || 10000
 				};
 				swal(angular.extend(app_config.swal, config));
 				swal.disableButtons();
@@ -245,27 +230,28 @@ angular.module('ng-unit', [])
 			spinner: function(id){
 				id = id || 'spinner';
 				var opts = {
-					lines: app_config.spin.opts.lines || 13,
-					length: app_config.spin.opts.length || 38,
-					width: app_config.spin.opts.width || 22,
-					radius: app_config.spin.opts.radius || 49,
-					scale: app_config.spin.opts.scale || 1,
-					corners: app_config.spin.opts.corners || 1,
-					color: app_config.spin.opts.color || '#333333',
-					fadeColor: app_config.spin.opts.fadeColor || 'transparent',
-					opacity: app_config.spin.opts.opacity || 0.3,
-					rotate: app_config.spin.opts.rotate || 0,
-					direction: app_config.spin.opts.direction || 1,
-					speed: app_config.spin.opts.speed || 1,
-					trail: app_config.spin.opts.trail || 60,
-					fps: app_config.spin.opts.fps || 20,
-					zIndex: app_config.spin.opts.zIndex || 2e9,
-					className: app_config.spin.opts.className || 'spinner',
-					top: app_config.spin.opts.top || '50%',
-					left: app_config.spin.opts.left || '50%',
-					shadow: app_config.spin.opts.shadow || 'none',
-					position: app_config.spin.opts.position || 'absolute'
+					lines: app_config.spin.lines || 13,
+					length: app_config.spin.length || 38,
+					width: app_config.spin.width || 22,
+					radius: app_config.spin.radius || 49,
+					scale: app_config.spin.scale || 1,
+					corners: app_config.spin.corners || 1,
+					color: app_config.spin.color || '#333333',
+					fadeColor: app_config.spin.fadeColor || 'transparent',
+					opacity: app_config.spin.opacity || 0.3,
+					rotate: app_config.spin.rotate || 0,
+					direction: app_config.spin.direction || 1,
+					speed: app_config.spin.speed || 1,
+					trail: app_config.spin.trail || 60,
+					fps: app_config.spin.fps || 20,
+					zIndex: app_config.spin.zIndex || 2e9,
+					className: app_config.spin.className || 'spinner',
+					top: app_config.spin.top || '50%',
+					left: app_config.spin.left || '50%',
+					shadow: app_config.spin.shadow || 'none',
+					position: app_config.spin.position || 'absolute'
 				};
+				var _self = this;
 				var target = document.getElementById(id);
 				target.style.display = 'inline';
 				target.style.position = 'fixed';
@@ -273,10 +259,14 @@ angular.module('ng-unit', [])
 				target.style.height = '100%';
 				target.style.top = '0';
 				target.style.left = '0';
-				target.style.background = '#333';
-				target.style.zIndex = '999999';
-				target.style.opacity = '0.6';
-				return new Spinner(opts).spin(target);
+				target.style.background = app_config.spin.box_background || '#333';
+				target.style.zIndex = app_config.spin.box_zIndex || '999999';
+				target.style.opacity = app_config.spin.box_opacity || '0.6';
+				var spinner = new Spinner(opts).spin(target);
+				$timeout(function(){
+					_self.spinner_stop(spinner, id);
+				}, app_config.timeout.duration || 10000);
+				return spinner;
 			},
 			spinner_stop: function (spinner, id) {
 				id = id || 'spinner';
@@ -362,12 +352,12 @@ angular.module('ng-unit', [])
 			 * @returns {Promise}
 			 */
 			http: function(params, method){
-				app_config.extended_timeout = app_config.extended_timeout || 2000;
-				app_config.hint_type = app_config.hint_type || 'toastr';
+				app_config.timeout.extended = app_config.timeout.extended || 2000;
+				app_config.type.hint = app_config.type.hint || 'toastr';
 				var config = {
-					url: (app_config.restful && app_config.restful.url)?app_config.restful.url:'http://www.yoursite.com/app.php?s=/Api/angular.html',
-					cache: (app_config.restful && app_config.restful.cache)?app_config.restful.cache:false,
-					timeout: (app_config.restful && app_config.restful.timeout)?app_config.restful.timeout:1000 * 15,
+					url: (app_config.url && app_config.url.restful)?app_config.url.restful:'http://www.yoursite.com/app.php?s=/Api/angular.html',
+					cache: (app_config.cache && app_config.cache.restful)?app_config.cache.restful:false,
+					timeout: (app_config.timeout && app_config.timeout.restful)?app_config.timeout.restful:1000 * 15,
 				}
 				var defer = $q.defer();
 				var _self = this;
@@ -389,61 +379,125 @@ angular.module('ng-unit', [])
 				$http(config).then(function(result){
 					if(result.status == 200 && angular.isObject(result.data) && result.data.type.toLowerCase() == 'success'){
 						if(_.indexOf(['post', 'put'], method.toLowerCase()) >= 0){
-							if(app_config.hint_type == 'alert'){
+							if(!angular.isUndefined(app_config.type) && !angular.isUndefined(app_config.type.hint) && app_config.type.hint == 'alert'){
 								_self.alert({
 									text: result.data.msg,
 									type: result.data.type.toLowerCase(),
-									timer: app_config.extended_timeout
 								},function(){
 									defer.resolve(result.data);
 								});
-							}
-							if(app_config.hint_type == 'toastr'){
+							}else if(!angular.isUndefined(app_config.type) && !angular.isUndefined(app_config.type.hint) && app_config.type.hint == 'toastr'){
 								_self.toastr(result.data.type.toLowerCase(), result.data.msg).then(function(){
 									defer.resolve(result.data);
 								});
+							}else{
+								defer.resolve(result.data);
 							}
 						}else{
 							defer.resolve(result.data);
 						}
 					}else{
-						if(app_config.hint_type == 'alert'){
+						if(app_config.debug.request) _self.debug('Request', angular.toJson(result), 'Error');
+						if(!angular.isUndefined(app_config.type) && !angular.isUndefined(app_config.type.hint) && app_config.type.hint == 'alert'){
 							_self.alert({
-								text: result.data.msg,
-								type: result.data.type.toLowerCase(),
+								text: 'HTTP请求失败! ' + result.data.msg,
+								type: 'error',
 								closeOnConfirm: true,
 								confirmButtonText: '确定',
 								showCancelButton: false,
 							},function(){
 								defer.reject(result);
 							});
-						}
-						if(app_config.hint_type == 'toastr'){
-							_self.toastr(result.data.type.toLowerCase(), result.data.msg).then(function(){
+						}else if(!angular.isUndefined(app_config.type) && !angular.isUndefined(app_config.type.hint) && app_config.type.hint == 'toastr'){
+							_self.toastr('error', 'HTTP请求失败! ' + result.data.msg).then(function(){
 								defer.reject(result);
 							});
+						}else{
+							defer.reject(result);
 						}
 					}
 				}, function(error){
-					if(app_config.hint_type == 'alert'){
+					if(app_config.debug.request) _self.debug('Request', angular.toJson(error), 'Error');
+					if(!angular.isUndefined(app_config.type) && !angular.isUndefined(app_config.type.hint) && app_config.type.hint == 'alert'){
 						_self.alert({
 							text: 'HTTP请求失败! ' + error,
 							type: 'error',
 							closeOnConfirm: true,
 							confirmButtonText: '确定',
 							showCancelButton: false,
-							timer: app_config.extended_timeout
 						},function(){
 							defer.reject(error);
 						});
-					}
-					if(app_config.hint_type == 'toastr'){
+					}else if(!angular.isUndefined(app_config.type) && !angular.isUndefined(app_config.type.hint) && app_config.type.hint == 'toastr'){
 						_self.toastr('error', 'HTTP请求失败! ' + error).then(function(){
 							defer.reject(error);
 						});
+					}else{
+						defer.reject(error);
 					}
 				});
 				return defer.promise;
+			},
+			/**
+			 * # 文件上传
+			 * @param files 需要上传的文件或文件数组
+			 * @param text  上传过程中进度条的提示说明
+			 * @param type  上传文件的类型
+			 * @param uid   上传者的uid, 默认为0
+			 * @param url   需要上传的服务器地址, 默认为配置中的 `url.upload` 地址
+			 * @returns {Promise}
+			 */
+			upload: function(files, text, type, uid, url){
+				var defer = $q.defer();
+				var _self = this;
+				if(!angular.isUndefined(files)){
+					text = text || '上传文件';
+					uid = uid || 0;
+					url = url || app_config.url.upload;
+					$ocLazyLoad.load('file_upload').then(function(){
+						var Upload = $injector.get('Upload');
+						Upload.upload({
+							url: url,
+							method: 'POST',
+							headers : {
+								'Content-Type': 'application/x-www-form-urlencoded'
+							},
+							data: {file: files, type: type, uid: uid},
+						}).then(function (result) {
+							defer.reject(result);
+						}, function (error) {
+							if(app_config.debug.upload) _self.debug('Upload', angular.toJson(error), 'Error');
+							if(app_config.hint_type == 'alert'){
+								_self.popup({
+									text: '文件上传请求失败! ' + error.status,
+									type: 'error',
+								});
+								defer.reject(error);
+							}else if(app_config.hint_type == 'toastr'){
+								_self.toastr('error', '文件上传请求失败!' + error.status).then(function(){
+									defer.reject(error);
+								});
+							}else{
+								defer.reject(error);
+							}
+						}, function (evt) {
+							_self.progress({text: text, width: parseInt(100.0 * evt.loaded / evt.total)});
+						});
+					});
+				}else{
+					var error = {
+						text: '没有指定上传文件! ',
+						type: 'error',
+					}
+					if(app_config.debug.upload) _self.debug('Upload', angular.toJson(error), 'Error');
+					_self.popup(error);
+					defer.reject(error);
+				}
+				return defer.promise;
+			},
+			debug: function(key, msg, type){
+				type = type || 'Debug';
+				$window.sessionStorage.setItem(type + '-' + key + '-' + this.datetime(), msg);
 			},
 		}
 	});

@@ -218,7 +218,7 @@ angular.module('ng-request-cache', [])
 							if(unitFactory.isEmptyObject(param.merge)){
 								defer.resolve(angular.extend(data, {request: 'http', type: 'success'}));
 							}else{
-								defer.resolve(angular.extend(data, {request: 'http_merge', type: 'success', merge: result.merge.data}));
+								defer.resolve(angular.extend(data, {request: 'http_merge', type: 'success', merge: result.merge}));
 							}
 						});
 					}else{
@@ -235,7 +235,7 @@ angular.module('ng-request-cache', [])
 									if(app_config.spin.type == 'spinner') unitFactory.spinner_stop(spinner);
 									if(app_config.spin.type == 'loading') unitFactory.loading_stop();
 								}
-								defer.resolve(angular.extend(data, {request: 'http_again', type: 'success', merge: result.merge.data}));
+								defer.resolve(angular.extend(data, {request: 'http_again', type: 'success', merge: result.merge}));
 							});
 						}
 					}

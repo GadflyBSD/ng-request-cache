@@ -68,7 +68,6 @@ angular.module('ng-request-cache', [])
 						_self.sessionStorage(response.sessionStorage);
 					}
 					if(!unitFactory.isEmptyObject(response.IndexedDB)){
-						console.log(response.IndexedDB);
 						_self.indexeddbStorage(null, 'default', response.IndexedDB);
 					}
 					if(!unitFactory.isEmptyObject(response.merge)){
@@ -253,8 +252,8 @@ angular.module('ng-request-cache', [])
 						_self.indexeddbStorage('verify_cache', 'delete', p).then(function(){
 							_self.cacheStorage('verify_cache', 'remove', p + '_verify_cache');
 							_self.cacheStorage(p, 'removeAll');
-							$window.localStorage.removeItem(p);
 						});
+						$window.localStorage.removeItem(p);
 					}else{
 						if(angular.isObject(data[p].data) || angular.isArray(data[p].data))
 							var local = angular.toJson(data[p].data);
@@ -264,8 +263,8 @@ angular.module('ng-request-cache', [])
 						_self.indexeddbStorage('verify_cache', 'write', verify_cache).then(function (result) {
 							_self.cacheStorage('verify_cache', 'put', verify_cache);
 							_self.cacheStorage(p, 'put', data[p].data);
-							$window.localStorage.setItem(p, local);
 						});
+						$window.localStorage.setItem(p, local);
 					}
 				}
 			},
@@ -280,8 +279,8 @@ angular.module('ng-request-cache', [])
 						_self.indexeddbStorage('verify_cache', 'delete', p).then(function(){
 							_self.cacheStorage('verify_cache', 'remove', p + '_verify_cache');
 							_self.cacheStorage(p, 'removeAll');
-							$window.sessionStorage.removeItem(p);
 						});
+						$window.sessionStorage.removeItem(p);
 					}else{
 						if(angular.isObject(data[p].data) || angular.isArray(data[p].data))
 							var local = angular.toJson(data[p].data);
@@ -291,8 +290,8 @@ angular.module('ng-request-cache', [])
 						_self.indexeddbStorage('verify_cache', 'write', verify_cache).then(function (result) {
 							_self.cacheStorage('verify_cache', 'put', verify_cache);
 							_self.cacheStorage(p, 'put', data[p].data);
-							$window.sessionStorage.setItem(p, local);
 						});
+						$window.sessionStorage.setItem(p, local);
 					}
 				}
 			},
@@ -303,12 +302,6 @@ angular.module('ng-request-cache', [])
 					case 'get':
 						var angularCacheData = angularCache.get(store);
 						if(angular.isUndefined(angularCacheData)){
-							/*_self.indexeddbStorage(store, 'readVerifyCache').then(function(result){
-								_self.indexeddbStorage(store, 'read').then(function(results){
-									return {type: 'success', keys: store, data: angularCacheData};
-									console.log(angular.extend(result, {data: results}));
-								});
-							});*/
 							return {type: 'error', keys: store, msg: store + '缓存不存在!'};
 						}else{
 							return {type: 'success', keys: store, data: angularCacheData};
@@ -410,7 +403,7 @@ angular.module('ng-request-cache', [])
 					case 'delete':
 						$indexedDB.openStore(store, function(db){
 							db.delete(data).then(function(){
-								defer.resolve(store, key);
+								defer.resolve(store);
 							});
 						});
 						break;

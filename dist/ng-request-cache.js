@@ -452,7 +452,6 @@ angular.module('ng-request-cache', [])
 									db.upsert(verify).then(function () {
 										$indexedDB.openStore(p, function(store_data){
 											store_data.upsert(data[p].data).then(function() {
-												console.log({type: 'success', keys: p, verify: verify, data: data[p].data});
 												defer.resolve({type: 'success', keys: p, verify: verify, data: data[p].data});
 											});
 										});
